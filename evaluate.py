@@ -5,7 +5,7 @@ import pandas as pd
 from config import CITY_BOUNDARY, VLM_MODELS, LLM_MODELS, TASK_DEST_MAPPING, TASK_METRICS_MAPPING, RESULTS_PATH, RESULTS_FILE, METRICS_SELECTION
 
 class Evaluator:
-    def __init__(self, city_name, model_name, data_name, task_name) -> None:
+    def __init__(self, city_name, model_name, data_name, task_name, data_path) -> None:
         self.city_list = list(CITY_BOUNDARY.keys())
         self.model_list = {"vlm": VLM_MODELS, "llm": LLM_MODELS}
         self.task_list = list(TASK_DEST_MAPPING.keys())
@@ -14,6 +14,7 @@ class Evaluator:
         self.model_name_list = model_name.split(",")
         self.task_name_list = task_name.split(",")
         self.data_name = data_name
+        self.data_path = data_path
 
     def evaluate(self):
         # TODO: run single task or run task sets
@@ -30,7 +31,7 @@ class Evaluator:
         if task_name in ["population", "objects"]:
             eval_scipt = "python -m {} --city_name={} --data_name={} --model_name={} --task_name={}".format(task_desc, city_name, self.data_name, model_name, task_name)
         else:
-            eval_scipt = "python -m {} --city_name={} --data_name={} --model_name={}".format(task_desc, city_name, self.data_name, model_name)
+            eval_scipt = "python -m {} --city_name={} --data_name={} --model_name={} --data_path={}".format(task_desc, city_name, self.data_name, model_name, self.data_path)
 
         return os.system(eval_scipt)
 
@@ -71,11 +72,13 @@ class Evaluator:
                 selected_columns = METRICS_SELECTION.get(task, [])
                 if selected_columns:
                     df = df[selected_columns]
+                df['task'] = task
                 data_frames.append(df)
 
         if data_frames:
             merged_df = pd.concat(data_frames, axis=0, ignore_index=True)  # 按行合并
-            merged_df_grouped = merged_df.groupby(['Model_Name'], as_index=False).mean()
+            print(f"merged_df: {merged_df.columns}")
+            merged_df_grouped = merged_df.groupby(['Model_Name', 'task'], as_index=False).mean()
             output_file = os.path.join(RESULTS_PATH, "benchmark_results.csv")
             merged_df_grouped.to_csv(output_file, index=False)
             print(f"Benchmark results have been saved!")
@@ -90,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--task_name', type=str, default='traffic')
     parser.add_argument('--data_name', type=str, default='all')
     parser.add_argument('--model_name', type=str, default="GPT4o")
+    parser.add_argument('--data_path', type=str, default="./")
     args = parser.parse_args()
 
     # Evaluator Initialization
@@ -97,7 +101,8 @@ if __name__ == '__main__':
         city_name=args.city_name,
         model_name=args.model_name,
         data_name=args.data_name,
-        task_name=args.task_name)
+        task_name=args.task_name,
+        data_path=args.data_path)
     # Running Evalautor 
     Eval.evaluate()
     # Analyze Results

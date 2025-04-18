@@ -140,7 +140,7 @@ def eval_pop(city_name_list, model_name_list, save_name):
 
     df = pd.DataFrame({'City_Name': all_city_pred_list, 'Model_Name': all_model_name_list, 'r2': all_r2_list, \
             'MAE': all_mae_list, 'RMSE': all_rmse_list, 'MSE': all_mse_list})
-    df.to_csv(os.path.join(REMOTE_SENSING_RESULTS_PATH, save_name), index=False)
+    df.to_csv(save_name, index=False)
 
 
 def eval_object(city_name_list, model_name_list, save_name):
@@ -231,7 +231,7 @@ def eval_object(city_name_list, model_name_list, save_name):
     df["Infrastructure_Accuracy"] = all_city_accurecy_list
     df["City_Name"] = all_city_pred_list
     df["Model_Name"] = all_model_name_list
-    df.to_csv(os.path.join(REMOTE_SENSING_RESULTS_PATH, save_name), index=False)
+    df.to_csv(save_name, index=False)
 
 
 if __name__ == "__main__":

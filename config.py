@@ -5,12 +5,15 @@ PROXY = "http://127.0.0.1:10190"
 PROXIES = {"http": PROXY, "https": PROXY}
 ############# TODO 不可对外暴露，仅用于内部测试
 MONGODB_URI = ""
+
+
 ###########
-MAP_DATA_PATH="citydata/EXP_ORIG_DATA/"
-MAP_CACHE_PATH="citydata/map_cache/"
-RESOURCE_PATH="citydata/resource/"
-ROUTING_PATH="citydata/routing_linux_amd64"
-RESULTS_PATH="results/"
+DATA_ROOT_PATH="/Users/yuzhengxu/STM/datasets"
+MAP_DATA_PATH=f"{DATA_ROOT_PATH}/citydata/EXP_ORIG_DATA/"
+MAP_CACHE_PATH=f"{DATA_ROOT_PATH}/citydata/map_cache/"
+RESOURCE_PATH=f"{DATA_ROOT_PATH}/citydata/resource/"
+ROUTING_PATH=f"{DATA_ROOT_PATH}/citydata/routing_linux_amd64"
+RESULTS_PATH=f"./results/"
 
 # geoqa
 GEOQA_SAMPLE_RATIO = 0.1
@@ -98,19 +101,19 @@ GEOQA_TASK_MAPPING_v2 = {
 # mobility prediction
 MOBILITY_SAMPLE_RATIO=0.1
 # remote sensing
-REMOTE_SENSING_PATH="citydata/remote_sensing/"
+REMOTE_SENSING_PATH=f"{DATA_ROOT_PATH}/citydata/remote_sensing/"
 REMOTE_SENSING_RESULTS_PATH=RESULTS_PATH+"remote_sensing/"
 REMOTE_SENSING_ZOOM_LEVEL=15
 WORLD_POP_DATA_PATH="{}ppp_2020_1km_Aggregated.tif".format(REMOTE_SENSING_PATH)
 # street view
-STREET_VIEW_PATH="citydata/street_view/"
+STREET_VIEW_PATH=f"{DATA_ROOT_PATH}/citydata/street_view/"
 SAMPLE_RATIO = 0.2
 ARCGIS_TILE_URL = "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/"
 # outdoor navigation
 # IMAGE_FOLDER = f"citydata/outdoor_navigation_tasks/NEW_StreetView_Images_CUT"
 # TODO: 为了方便测试，暂时使用绝对路径
-IMAGE_FOLDER = f"/data3/liutianhui/NEW_StreetView_Images_CUT"
-SAMPLE_POINT_PATH="citydata/outdoor_navigation_tasks/sample_points/"
+IMAGE_FOLDER = f"{DATA_ROOT_PATH}/citydata/outdoor_navigation_tasks/NEW_StreetView_Images_CUT"
+SAMPLE_POINT_PATH=f"{DATA_ROOT_PATH}/citydata/outdoor_navigation_tasks/sample_points/"
 STEP = 50
 # 控制是否更新该任务
 NAVIGATION_UPGRADE = True
@@ -130,15 +133,15 @@ REGION_CODE = {
     "Sydney": 120000
 }
 # traffic singal
-TRIP_DATA_PATH="citydata/trips/"
+TRIP_DATA_PATH=f"{DATA_ROOT_PATH}/citydata/trips/"
 
 
 VLM_API = ["GPT4o", "GPT4omini", "LLama-3.2-90B", "LLama-3.2-11B", "Qwen2-VL-72B", "gpt-4o-mini"]
 VLM_MODELS = [
     "QwenVLPlus", "GPT4o", "GPT4o_MINI", "cogvlm2-llama3-chat-19B", "InternVL2-40B", "MiniCPM-Llama3-V-2_5", "llava_next_yi_34b", "llava_next_llama3", "Yi_VL_6B", "Yi_VL_34B", "llava_v1.5_7b", "glm-4v-9b", "InternVL2-2B", "InternVL2-4B", "InternVL2-8B", "InternVL2-26B", "Qwen2-VL-7B-Instruct", "Qwen2-VL-2B-Instruct", "GPT4omini", "LLama-3.2-90B", "LLama-3.2-11B", "Qwen2-VL-72B"]
 
-VLLM_MODEL_PATH_PREFIX = "/data3/fengjie/init_ckpt/"
-VLLM_MODEL_PATH_PREFIX2 = "/data1/citygpt/init_ckpt/multi-modal/"
+VLLM_MODEL_PATH_PREFIX = f"{DATA_ROOT_PATH}/init_ckpt/"
+VLLM_MODEL_PATH_PREFIX2 = f"{DATA_ROOT_PATH}/multi-modal/"
 VLLM_MODEL_PATH = {
     "cogvlm2-llama3-chat-19B": os.path.join(VLLM_MODEL_PATH_PREFIX, "cogvlm2-llama3-chat-19B"),
     "InternVL2-40B": os.path.join(VLLM_MODEL_PATH_PREFIX, "InternVL2-40B"),
@@ -163,12 +166,15 @@ LLM_MODELS = [
     "DeepSeek-67B", "DeepSeekV2", "GPT3.5-Turbo", "GPT4-Turbo"]
 
 INFER_SERVER = {
-    "OpenAI": ["GPT3.5-Turbo", "GPT4-Turbo", "GPT4omini"],
-    "DeepInfra": ["Mistral-7B", "Mixtral-8x22B", "LLama3-8B", "LLama3-70B", "Gemma2-9B", "Gemma2-27B", "LLama-3.2-90B", "LLama-3.2-11B"],
-    "Siliconflow": ["Qwen2-7B", "Qwen2-72B", "Intern2.5-7B", "Intern2.5-20B", "DeepSeekV2", "Qwen2-VL-72B"],
-    "DeepBricks": ["gpt-4o-mini"]
+    "Azure": ["gpt-4o", "o1-mini"],
+    #"OpenAI": ["GPT3.5-Turbo", "GPT4-Turbo", "GPT4omini"],
+    #"DeepInfra": ["Mistral-7B", "Mixtral-8x22B", "LLama3-8B", "LLama3-70B", "Gemma2-9B", "Gemma2-27B", "LLama-3.2-90B", "LLama-3.2-11B"],
+    #"Siliconflow": ["Qwen2-7B", "Qwen2-72B", "Intern2.5-7B", "Intern2.5-20B", "DeepSeekV2", "Qwen2-VL-72B"],
+    #"DeepBricks": ["gpt-4o-mini"]
 }
 LLM_MODEL_MAPPING = {
+    "gpt-4o":"gpt-4o",
+    "o1-mini":"o1-mini",
     "Qwen2-7B":"Qwen/Qwen2-7B-Instruct",
     "Qwen2-72B":"Qwen/Qwen2-72B-Instruct",
     "Intern2.5-7B":"internlm/internlm2_5-7b-chat",
@@ -208,7 +214,7 @@ TASK_METRICS_MAPPING = {
     "exploration": "citybench.urban_exploration.metrics",
     # visual 
     "population": "citybench.remote_sensing.metrics",
-    "objects": "citybench.remoet_sensing.metrics",
+    "objects": "citybench.remote_sensing.metrics",
     "geoloc": "citybench.street_view.metrics",
     "navigation": "citybench.outdoor_navigation.metrics"
     }
@@ -227,7 +233,7 @@ RESULTS_FILE = {
 METRICS_SELECTION = {
     "traffic": ["Average_Queue_Length", "Throughput"], 
     "geoqa": ["GeoQA_Average_Accuracy"],
-    "mobility": ["Acc@1", "F1"],
+    "mobility": ["Model_Name", "Acc@1", "F1"],
     "exploration": ["Exploration_Success_Ratio", "Exploration_Average_Steps"],
     "population": ["RMSE", "r2"],
     "objects": ["Infrastructure_Accuracy"],

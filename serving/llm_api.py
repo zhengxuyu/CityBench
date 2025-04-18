@@ -3,14 +3,16 @@ import re
 import httpx
 import time
 from thefuzz import process
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 
 from config import PROXY,LLM_MODEL_MAPPING, INFER_SERVER
 
-OPENAI_APIKEY = os.environ["OpenAI_API_KEY"]
-DEEPINFRA_APIKEY = os.environ["DeepInfra_API_KEY"]
-SILICONFLOW_APIKEY = os.environ["SiliconFlow_API_KEY"]
-DEEPBRICKS_APIKEY = os.environ["DeepBricks_API_KEY"]
+
+AZURE_APIKEY = os.environ["AZURE_API_KEY"] if "AZURE_API_KEY" in os.environ else None
+OPENAI_APIKEY = os.environ["OpenAI_API_KEY"] if "OpenAI_API_KEY" in os.environ else None
+DEEPINFRA_APIKEY = os.environ["DeepInfra_API_KEY"] if "DeepInfra_API_KEY" in os.environ else None
+SILICONFLOW_APIKEY = os.environ["SiliconFlow_API_KEY"] if "SiliconFlow_API_KEY" in os.environ else None
+DEEPBRICKS_APIKEY = os.environ["DeepBricks_API_KEY"] if "DeepBricks_API_KEY" in os.environ else None
 
 def get_chat_completion(session, model_name, max_tokens=1200, temperature=0, infer_server=None, json_mode=False):
     client = get_llm_model_client(model_name, infer_server)
@@ -64,6 +66,7 @@ def get_llm_model_client(model_name, infer_server=None):
             if model_name in INFER_SERVER[server_name]:
                 infer_server=server_name
                 break
+        
 
     # print(f"Using {infer_server} to infer {model_name}")
     # 统一--传进来的是model_name
@@ -91,6 +94,12 @@ def get_llm_model_client(model_name, infer_server=None):
         base_url="https://api.deepbricks.ai/v1/",
         api_key=DEEPBRICKS_APIKEY,
         http_client=httpx.Client(proxies=PROXY),
+        )
+    elif infer_server =="Azure":
+        client = AzureOpenAI(
+            base_url=f"https://terminusai2024simon.openai.azure.com/openai/deployments/{model_name}",
+            api_key=AZURE_APIKEY,
+            api_version="2025-01-01-preview"
         )
     else:
         raise NotImplementedError

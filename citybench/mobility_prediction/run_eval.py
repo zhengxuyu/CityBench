@@ -44,7 +44,6 @@ def get_dataset(dataname, split_path="citydata/mobility/checkin_split/", test_pa
     if dataname == 'geolife':
         tv_data['duration'] = tv_data['duration'].astype(int)
 
-    # print("Number of total test sample: ", len(test_file))
     return tv_data, test_file
 
 
@@ -152,6 +151,8 @@ def single_query_top1_fsq(historical_data, X, model_name, model):
     if model is not None:
         completion = get_model_response_hf(prompt, model)
         token_usage = 0
+    elif model_name == "o1-mini":
+        completion, token_usage = get_chat_completion(session=[{"role": "user", "content": [{"type": "text", "text": prompt}]}], model_name=model_name, json_mode=True, max_tokens=1200, temperature=0)
     else:
         completion, token_usage = get_chat_completion(session=[{"role": "user", "content": prompt}], model_name=model_name, json_mode=True, max_tokens=1200, temperature=0)
     return completion, token_usage, prompt
@@ -280,6 +281,7 @@ def query_all_user(data_name, split_path, dataname, uid_list, train_data, num_hi
 
     for uid in uid_list:  #train_data为train与val的拼接，test为字典
         user_train = get_user_data(train_data, uid, num_historical_stay)  #根据每一个用户的历史步数进行预测
+
         historical_data, predict_X, predict_y = organise_data(data_name, split_path, dataname, user_train, test_file, uid, num_context_stay, sample_single_user)   #predict_X, predict_y都是基于test生成的，historical_data是基于user_train生成的
         all_traj += len(predict_y)
         single_user_query(dataname, uid, historical_data, predict_X, predict_y, top_k=top_k,
@@ -348,14 +350,13 @@ def main(city, model_name, user_cnt=50, sample_single_user=10, num_historical_st
 
         uid_list = get_unqueried_user(dataname, user_cnt, test_path=test_path, output_dir=output_dir)  #output_dir存储预测结果。只选取其中10个user
         # print(f"uid_list: {uid_list}")
-
         traj = query_all_user(data_name, split_path, dataname, uid_list, tv_data, num_historical_stay, num_context_stay,
                        test_file, output_dir=output_dir, log_file=log_file, top_k=top_k, is_wt=with_time,
                        sleep_query=sleep_single_query, sleep_crash=sleep_if_crash, model_name=model_name, sample_single_user=sample_single_user, model=model)
         all_traj += traj
 
         # print("Query done")
-    acc1, f1 = cal_metrics(output_dir=output_dir)
+    model, city, acc1, f1 = cal_metrics(output_dir=output_dir)
     print("city:{} all_traj:{} acc1:{} f1:{}".format(city, all_traj, acc1, f1))
 
 
@@ -367,12 +368,16 @@ if __name__=="__main__":
     parser.add_argument('--user_cnt', type=int, default=50, help="#总测试用户数")
     parser.add_argument('--sample_single_user', type=int, default=10, help="#每个用户轨迹数")
     parser.add_argument('--data_name',type=str, default='mini', choices=['all','mini'])
+    parser.add_argument('--data_path', type=str, default="./")
     parser.add_argument('--split_path', type=str, default="citydata/mobility/checkin_split/")
     parser.add_argument('--test_path', type=str, default="citydata/mobility/checkin_test_pk/")
     parser.add_argument('--num_historical_stay', type=int, default=40)
     parser.add_argument('--num_context_stay', type=int, default=5)
     
     args = parser.parse_args()
+
+    args.split_path = os.path.join(args.data_path, args.split_path)
+    args.test_path = os.path.join(args.data_path, args.test_path)
 
     main(
         args.city_name, 
